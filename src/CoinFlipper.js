@@ -1,30 +1,48 @@
 import React, { Component } from "react";
 import Coin from "./Coin";
+import { choice } from "./helpers";
+
 export default class CoinFlipper extends Component {
   static defaultProps = {
-    face: "heads",
-    numTosses: 0
+    coins: [
+      { side: "heads", imgSrc: "https://tinyurl.com/react-coin-heads-jpg" },
+      { side: "tails", imgSrc: "https://tinyurl.com/react-coin-tails-jpg" }
+    ]
   };
   constructor(props) {
     super(props);
-    this.setState = {
-      face: "heads",
-      numTosses: 0
+    this.state = {
+      currCoin: null,
+      nFlips: 0,
+      nHeads: 0,
+      nTails: 0
     };
     this.handleClick = this.handleClick.bind(this);
   }
-
-  handleClick() {
-    this.imgGetter();
+  flipCoin() {
+    const newCoin = choice(this.props.coins);
+    this.setState(st => {
+      return {
+        currCoin: newCoin,
+        nFlips: st.nFlips + 1,
+        nHeads: st.nHeads + (newCoin.side === "heads" ? 1 : 0),
+        nTails: st.nTails + (newCoin.side === "tails" ? 1 : 0)
+      };
+    });
   }
-
-  imgGetter() {}
+  handleClick(e) {
+    this.flipCoin();
+  }
   render() {
     return (
-      <div className="CoinFlipper">
-        <h1>Let's flip a coin! </h1>
-        <Coin headsImg={this.props.face} />
-        <button onClick={this.handleClick}>Toss the coin</button>
+      <div className="CoinContainer">
+        <h2>Let's Flip A Coin!</h2>
+        {this.state.currCoin && <Coin info={this.state.currCoin} />}
+        <button onClick={this.handleClick}>Flip Me!</button>
+        <p>
+          Out of {this.state.nFlips} flips, there have been {this.state.nHeads}{" "}
+          heads and {this.state.nTails} tails.
+        </p>
       </div>
     );
   }
